@@ -1,5 +1,8 @@
 <?php
 
+// Suppress deprecated warnings for PDO::MYSQL_ATTR_SSL_CA
+error_reporting(E_ALL & ~E_DEPRECATED);
+
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
