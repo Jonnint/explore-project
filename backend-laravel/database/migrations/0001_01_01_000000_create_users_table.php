@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('phone')->nullable()->unique();
             $table->string('profile_picture')->nullable();
             $table->string('region')->nullable();
+            $table->enum('role', ['superadmin', 'admin', 'agent'])->default('agent');
+            $table->integer('token_limit')->nullable();
+            $table->integer('tokens_used')->default(0);
             $table->json('notification_settings')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

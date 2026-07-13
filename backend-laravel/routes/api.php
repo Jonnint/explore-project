@@ -71,6 +71,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/read-all', [NotificationApiController::class, 'markAllAsRead']);
     Route::get('/notifications/settings', [NotificationApiController::class, 'getSettings']);
     Route::put('/notifications/settings', [NotificationApiController::class, 'updateSettings']);
+
+    // User Management
+    Route::get('/users', [\App\Http\Controllers\Api\UserManagementController::class, 'index']);
+    Route::get('/users/{id}', [\App\Http\Controllers\Api\UserManagementController::class, 'show']);
+    Route::post('/users', [\App\Http\Controllers\Api\UserManagementController::class, 'store']);
+    Route::put('/users/{id}', [\App\Http\Controllers\Api\UserManagementController::class, 'update']);
+    Route::delete('/users/{id}', [\App\Http\Controllers\Api\UserManagementController::class, 'destroy']);
+    Route::post('/users/{id}/reset-token', [\App\Http\Controllers\Api\UserManagementController::class, 'resetToken']);
 });
 
 // ── Public routes ─────────────────────────────────────────────────────────────

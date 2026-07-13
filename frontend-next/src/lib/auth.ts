@@ -5,6 +5,9 @@ export interface AuthUser {
   name: string;
   email: string;
   phone?: string;
+  role?: 'superadmin' | 'admin' | 'agent';
+  token_limit?: number | null;
+  tokens_used?: number;
 }
 
 export interface LoginResponse {

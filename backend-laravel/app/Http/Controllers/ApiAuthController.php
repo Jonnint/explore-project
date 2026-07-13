@@ -46,6 +46,7 @@ class ApiAuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'phone' => $user->phone,
+                'role' => $user->role,
             ],
         ]);
     }
@@ -161,6 +162,9 @@ class ApiAuthController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'region' => $user->region,
+                'role' => $user->role,
+                'token_limit' => $user->token_limit,
+                'tokens_used' => $user->tokens_used,
             ],
             'whatsapp_connection' => [
                 'status' => $whatsappStatus,

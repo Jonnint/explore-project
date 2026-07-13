@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'phone', 'password', 'profile_picture', 'region', 'notification_settings'])]
+#[Fillable(['name', 'email', 'phone', 'password', 'profile_picture', 'region', 'role', 'token_limit', 'tokens_used', 'notification_settings'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -25,7 +25,34 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
             'notification_settings' => 'array',
+            'token_limit' => 'integer',
+            'tokens_used' => 'integer',
         ];
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'superadmin';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isAgent(): bool
+    {
+        return $this->role === 'agent';
+    }
+
+    public function canManageUsers(): bool
+    {
+        return $this->isSuperAdmin();
+    }
+
+    public function canViewUsers(): bool
+    {
+        return $this->isSuperAdmin() || $this->isAdmin();
     }
 
     public function getNotificationSettings(): array

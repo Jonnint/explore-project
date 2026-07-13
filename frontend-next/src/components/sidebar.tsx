@@ -12,7 +12,8 @@ import {
     Cog6ToothIcon,
     ArrowRightOnRectangleIcon,
     Bars3Icon,
-    XMarkIcon
+    XMarkIcon,
+    UsersIcon
 } from '@heroicons/react/24/outline';
 import type { AuthUser } from '@/lib/auth';
 
@@ -69,6 +70,17 @@ export default function Sidebar({ user }: Props) {
             icon: BookOpenIcon,
         },
     ];
+
+    // Show user management for superadmin and admin only
+    const canViewUserManagement = user?.role === 'superadmin' || user?.role === 'admin';
+
+    if (canViewUserManagement) {
+        menuItems.push({
+            name: 'Management User',
+            href: '/dashboard/user-management',
+            icon: UsersIcon,
+        });
+    }
 
     const bottomMenuItems = [
         {
