@@ -346,6 +346,9 @@ export default function UserManagementClient({ initialData, currentUser }: Props
                             style={{ width: `${Math.min(tokenPercentage, 100)}%` }}
                           />
                         </div>
+                        {user.token_limit !== null && user.tokens_used >= user.token_limit && (
+                          <p className="text-xs font-medium text-rose-500">Token user sudah limit</p>
+                        )}
                       </div>
                     </td>
                     {isSuperAdmin && (
@@ -563,6 +566,9 @@ export default function UserManagementClient({ initialData, currentUser }: Props
                                 }}
                               />
                             </div>
+                            {editingUser.token_limit !== null && editingUser.tokens_used >= editingUser.token_limit && (
+                              <p className="text-xs text-rose-500">Token user sudah limit</p>
+                            )}
                           </div>
                         )}
                         <p className="text-xs text-slate-500">Kosongkan untuk unlimited token</p>
