@@ -19,7 +19,7 @@ export const metadata = {
 export default async function UserManagementPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
   const cookieStore = await cookies();
   const token = cookieStore.get('auth_token')?.value;
@@ -31,10 +31,11 @@ export default async function UserManagementPage({
     redirect('/dashboard');
   }
 
-  const page = searchParams.page ?? '1';
+  const params = await searchParams;
+  const page = params.page ?? '1';
   const queryParams: Record<string, string> = { page };
-  if (searchParams.search) queryParams.search = searchParams.search;
-  if (searchParams.role) queryParams.role = searchParams.role;
+  if (params.search) queryParams.search = params.search;
+  if (params.role) queryParams.role = params.role;
 
   const data = await apiGet<UserListResponse>('/users', queryParams);
 

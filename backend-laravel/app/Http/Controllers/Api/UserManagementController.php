@@ -43,6 +43,13 @@ class UserManagementController extends Controller
         ]);
     }
 
+    public function getRoles(): JsonResponse
+    {
+        return response()->json([
+            'roles' => ['superadmin', 'admin', 'agent'],
+        ]);
+    }
+
     public function show(Request $request, $id): JsonResponse
     {
         if (! $request->user()->canViewUsers()) {

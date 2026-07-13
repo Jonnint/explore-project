@@ -323,7 +323,6 @@ export default function UserManagementClient({ initialData, currentUser }: Props
                   <tr key={user.id} className="border-b border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-[#111827] transition-colors">
                     <td className="py-4 px-4">
                       <div className="font-medium text-slate-900 dark:text-[#F9FAFB]">{user.name}</div>
-                      <div className="text-xs text-slate-500 dark:text-[#9CA3AF]">{user.created_at ? new Date(user.created_at).toLocaleDateString() : '—'}</div>
                     </td>
                     <td className="py-4 px-4 text-slate-700 dark:text-[#F9FAFB]">{user.email}</td>
                     <td className="py-4 px-4 text-slate-700 dark:text-[#F9FAFB]">{user.phone || '-'}</td>
