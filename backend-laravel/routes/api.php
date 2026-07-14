@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 // ── Auth (public) ────────────────────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
     Route::post('/login', [ApiAuthController::class, 'login']);
+    Route::post('/register', [ApiAuthController::class, 'register']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [ApiAuthController::class, 'logout']);
@@ -80,6 +81,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/users/{id}', [\App\Http\Controllers\Api\UserManagementController::class, 'update']);
     Route::delete('/users/{id}', [\App\Http\Controllers\Api\UserManagementController::class, 'destroy']);
     Route::post('/users/{id}/reset-token', [\App\Http\Controllers\Api\UserManagementController::class, 'resetToken']);
+    Route::post('/users/{id}/verify', [\App\Http\Controllers\Api\UserManagementController::class, 'verify']);
+    Route::post('/users/{id}/unverify', [\App\Http\Controllers\Api\UserManagementController::class, 'unverify']);
+    Route::post('/users/{id}/activate', [\App\Http\Controllers\Api\UserManagementController::class, 'activate']);
+    Route::post('/users/{id}/deactivate', [\App\Http\Controllers\Api\UserManagementController::class, 'deactivate']);
 });
 
 // ── Public routes ─────────────────────────────────────────────────────────────

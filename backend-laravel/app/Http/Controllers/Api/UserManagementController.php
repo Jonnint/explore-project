@@ -30,6 +30,18 @@ class UserManagementController extends Controller
             $query->where('role', $role);
         }
 
+        if ($status = $request->query('status')) {
+            if ($status === 'verified') {
+                $query->where('verified', true);
+            } elseif ($status === 'unverified') {
+                $query->where('verified', false);
+            } elseif ($status === 'active') {
+                $query->where('active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('active', false);
+            }
+        }
+
         $users = $query->paginate(15);
 
         return response()->json([
@@ -46,7 +58,7 @@ class UserManagementController extends Controller
     public function getRoles(): JsonResponse
     {
         return response()->json([
-            'roles' => ['superadmin', 'admin', 'agent'],
+            'roles' => ['superadmin', 'admin', 'agent', 'user'],
         ]);
     }
 
@@ -76,9 +88,11 @@ class UserManagementController extends Controller
             'email' => ['required', 'email', 'unique:users,email'],
             'phone' => ['nullable', 'string', 'max:20', 'unique:users,phone'],
             'password' => ['required', 'string', 'min:8'],
-            'role' => ['required', Rule::in(['superadmin', 'admin', 'agent'])],
+            'role' => ['required', Rule::in(['superadmin', 'admin', 'agent', 'user'])],
             'token_limit' => ['nullable', 'integer', 'min:0'],
             'region' => ['nullable', 'string', 'max:255'],
+            'verified' => ['nullable', 'boolean'],
+            'active' => ['nullable', 'boolean'],
         ]);
 
         $user = User::create($validated);
@@ -105,9 +119,11 @@ class UserManagementController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'phone' => ['nullable', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($user->id)],
-            'role' => ['required', Rule::in(['superadmin', 'admin', 'agent'])],
+            'role' => ['required', Rule::in(['superadmin', 'admin', 'agent', 'user'])],
             'token_limit' => ['nullable', 'integer', 'min:0'],
             'region' => ['nullable', 'string', 'max:255'],
+            'verified' => ['nullable', 'boolean'],
+            'active' => ['nullable', 'boolean'],
         ]);
 
         if ($request->has('password') && $request->password) {
@@ -159,6 +175,82 @@ class UserManagementController extends Controller
 
         return response()->json([
             'message' => 'Token usage reset successfully',
+            'user' => $user,
+        ]);
+    }
+
+    public function verify(Request $request, $id): JsonResponse
+    {
+        if (! $request->user()->canManageUsers()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $user = User::find($id);
+        if (! $user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $user->update(['verified' => true]);
+
+        return response()->json([
+            'message' => 'User verified successfully',
+            'user' => $user,
+        ]);
+    }
+
+    public function unverify(Request $request, $id): JsonResponse
+    {
+        if (! $request->user()->canManageUsers()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $user = User::find($id);
+        if (! $user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $user->update(['verified' => false]);
+
+        return response()->json([
+            'message' => 'User unverified successfully',
+            'user' => $user,
+        ]);
+    }
+
+    public function activate(Request $request, $id): JsonResponse
+    {
+        if (! $request->user()->canManageUsers()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $user = User::find($id);
+        if (! $user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $user->update(['active' => true]);
+
+        return response()->json([
+            'message' => 'User activated successfully',
+            'user' => $user,
+        ]);
+    }
+
+    public function deactivate(Request $request, $id): JsonResponse
+    {
+        if (! $request->user()->canManageUsers()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $user = User::find($id);
+        if (! $user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $user->update(['active' => false]);
+
+        return response()->json([
+            'message' => 'User deactivated successfully',
             'user' => $user,
         ]);
     }

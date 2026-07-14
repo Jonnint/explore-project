@@ -30,7 +30,12 @@ function LoginForm() {
         setError(data.message ?? 'Login gagal.');
         return;
       }
-      router.push(redirect);
+      const userRole = data.user?.role;
+      if (userRole === 'user') {
+        router.push('/dashboard/user');
+      } else {
+        router.push(redirect);
+      }
       router.refresh();
     } catch {
       setError('Tidak dapat terhubung ke server.');

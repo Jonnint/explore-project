@@ -10,6 +10,7 @@ interface SearchParams {
   search?: string;
   role?: string;
   page?: string;
+  status?: string;
 }
 
 export const metadata = {

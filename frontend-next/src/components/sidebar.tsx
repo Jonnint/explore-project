@@ -38,38 +38,48 @@ export default function Sidebar({ user }: Props) {
         }
     }
 
-    const menuItems = [
-        {
+    const menuItems = [];
+
+    if (user?.role === 'user') {
+        menuItems.push({
             name: 'Beranda',
-            href: '/dashboard',
+            href: '/dashboard/user',
             icon: HomeIcon,
-        },
-        {
-            name: 'Link Clicks',
-            href: '/dashboard/link-clicks',
-            icon: ChartBarIcon,
-        },
-        {
-            name: 'Lead & Percakapan',
-            href: '/dashboard/leads',
-            icon: ChatBubbleLeftRightIcon,
-        },
-        {
-            name: 'Produk',
-            href: '/dashboard/products',
-            icon: ShoppingBagIcon,
-        },
-        {
-            name: 'Analitik',
-            href: '/dashboard/analytics',
-            icon: ChartBarIcon,
-        },
-        {
-            name: 'Basis Pengetahuan',
-            href: '/dashboard/knowledge',
-            icon: BookOpenIcon,
-        },
-    ];
+        });
+    } else {
+        menuItems.push(
+            {
+                name: 'Beranda',
+                href: '/dashboard',
+                icon: HomeIcon,
+            },
+            {
+                name: 'Link Clicks',
+                href: '/dashboard/link-clicks',
+                icon: ChartBarIcon,
+            },
+            {
+                name: 'Lead & Percakapan',
+                href: '/dashboard/leads',
+                icon: ChatBubbleLeftRightIcon,
+            },
+            {
+                name: 'Produk',
+                href: '/dashboard/products',
+                icon: ShoppingBagIcon,
+            },
+            {
+                name: 'Analitik',
+                href: '/dashboard/analytics',
+                icon: ChartBarIcon,
+            },
+            {
+                name: 'Basis Pengetahuan',
+                href: '/dashboard/knowledge',
+                icon: BookOpenIcon,
+            }
+        );
+    }
 
     // Show user management for superadmin and admin only
     const canViewUserManagement = user?.role === 'superadmin' || user?.role === 'admin';

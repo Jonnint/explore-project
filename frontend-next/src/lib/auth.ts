@@ -5,7 +5,7 @@ export interface AuthUser {
   name: string;
   email: string;
   phone?: string;
-  role?: 'superadmin' | 'admin' | 'agent';
+  role?: 'superadmin' | 'admin' | 'agent' | 'user';
   token_limit?: number | null;
   tokens_used?: number;
 }

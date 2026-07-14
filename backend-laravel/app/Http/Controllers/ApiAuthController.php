@@ -47,6 +47,8 @@ class ApiAuthController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'role' => $user->role,
+                'verified' => $user->verified,
+                'active' => $user->active,
             ],
         ]);
     }
@@ -165,6 +167,8 @@ class ApiAuthController extends Controller
                 'role' => $user->role,
                 'token_limit' => $user->token_limit,
                 'tokens_used' => $user->tokens_used,
+                'verified' => $user->verified,
+                'active' => $user->active,
             ],
             'whatsapp_connection' => [
                 'status' => $whatsappStatus,
@@ -175,5 +179,46 @@ class ApiAuthController extends Controller
                 'messages_today' => $messagesToday,
             ],
         ]);
+    }
+
+    /**
+     * Register — return Sanctum token and user details.
+     * POST /api/auth/register
+     */
+    public function register(Request $request): JsonResponse
+    {
+        $request->validate([
+            'username' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'phone' => ['nullable', 'string', 'max:20', 'unique:users'],
+            'password' => ['required', 'string', 'min:8'],
+        ]);
+
+        $user = User::create([
+            'name' => $request->username,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => bcrypt($request->password),
+            'role' => 'user',
+            'verified' => false,
+            'active' => true,
+            'token_limit' => null,
+            'tokens_used' => 0,
+        ]);
+
+        $token = $user->createToken('next-app')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'role' => $user->role,
+                'verified' => $user->verified,
+                'active' => $user->active,
+            ],
+        ], 201);
     }
 }

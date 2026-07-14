@@ -197,6 +197,8 @@ export default function UserManagementClient({ initialData, currentUser }: Props
       role: formData.get('role'),
       token_limit: formData.get('token_limit') ? Number(formData.get('token_limit')) : null,
       region: formData.get('region') || null,
+      verified: formData.get('verified') === 'true',
+      active: formData.get('active') === 'true',
     };
 
     try {
@@ -241,6 +243,8 @@ export default function UserManagementClient({ initialData, currentUser }: Props
       role: formData.get('role'),
       token_limit: formData.get('token_limit') ? Number(formData.get('token_limit')) : null,
       region: formData.get('region') || null,
+      verified: formData.get('verified') === 'true',
+      active: formData.get('active') === 'true',
     } as Record<string, any>;
 
     const password = formData.get('password');
@@ -665,6 +669,7 @@ export default function UserManagementClient({ initialData, currentUser }: Props
                           defaultValue={editingUser?.role ?? 'agent'}
                           className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none shadow-sm shadow-slate-950/5 placeholder:text-slate-400 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:shadow-none"
                         >
+                          <option value="user">User</option>
                           <option value="agent">Agent</option>
                           <option value="admin">Admin</option>
                           <option value="superadmin">Superadmin</option>
@@ -713,6 +718,35 @@ export default function UserManagementClient({ initialData, currentUser }: Props
                           </div>
                         )}
                         <p className="text-xs text-slate-500">Kosongkan untuk unlimited token</p>
+                      </div>
+                    </div>
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="verified">Status Verifikasi *</Label>
+                        <select
+                          id="verified"
+                          name="verified"
+                          required
+                          defaultValue={editingUser ? (editingUser.verified ? 'true' : 'false') : 'false'}
+                          className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none shadow-sm shadow-slate-950/5 placeholder:text-slate-400 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:shadow-none"
+                        >
+                          <option value="false">Unverified</option>
+                          <option value="true">Verified</option>
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="active">Status Akun *</Label>
+                        <select
+                          id="active"
+                          name="active"
+                          required
+                          defaultValue={editingUser ? (editingUser.active !== false ? 'true' : 'false') : 'true'}
+                          className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none shadow-sm shadow-slate-950/5 placeholder:text-slate-400 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:shadow-none"
+                        >
+                          <option value="true">Active</option>
+                          <option value="false">Inactive</option>
+                        </select>
                       </div>
                     </div>
 

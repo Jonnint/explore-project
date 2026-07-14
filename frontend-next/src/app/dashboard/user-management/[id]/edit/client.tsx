@@ -32,6 +32,8 @@ export default function EditUserClient({ user }: Props) {
       role: formData.get('role'),
       token_limit: formData.get('token_limit') ? parseInt(formData.get('token_limit') as string) : null,
       region: formData.get('region') || null,
+      verified: formData.get('verified') === 'true',
+      active: formData.get('active') === 'true',
     };
 
     const password = formData.get('password');
@@ -198,6 +200,7 @@ export default function EditUserClient({ user }: Props) {
                 defaultValue={user.role}
                 className="w-full px-3 py-2 border rounded-md border-[#E2E0D8] dark:border-[#374151] dark:bg-[#111827] text-[#1a1a18] dark:text-[#F9FAFB]"
               >
+                <option value="user">User</option>
                 <option value="agent">Agent</option>
                 <option value="admin">Admin</option>
                 <option value="superadmin">Superadmin</option>
@@ -220,6 +223,36 @@ export default function EditUserClient({ user }: Props) {
                 Kosongkan untuk unlimited token
               </p>
               {errors.token_limit && <p className="text-sm text-red-600">{errors.token_limit}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="verified">Status Verifikasi *</Label>
+              <select
+                id="verified"
+                name="verified"
+                required
+                defaultValue={user.verified ? 'true' : 'false'}
+                className="w-full px-3 py-2 border rounded-md border-[#E2E0D8] dark:border-[#374151] dark:bg-[#111827] text-[#1a1a18] dark:text-[#F9FAFB]"
+              >
+                <option value="false">Unverified</option>
+                <option value="true">Verified</option>
+              </select>
+              {errors.verified && <p className="text-sm text-red-600">{errors.verified}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="active">Status Akun *</Label>
+              <select
+                id="active"
+                name="active"
+                required
+                defaultValue={user.active !== false ? 'true' : 'false'}
+                className="w-full px-3 py-2 border rounded-md border-[#E2E0D8] dark:border-[#374151] dark:bg-[#111827] text-[#1a1a18] dark:text-[#F9FAFB]"
+              >
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+              {errors.active && <p className="text-sm text-red-600">{errors.active}</p>}
             </div>
 
             <div className="space-y-2">

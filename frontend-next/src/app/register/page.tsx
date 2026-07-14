@@ -21,7 +21,6 @@ export default function RegisterPage() {
     setError(null);
     setLoading(true);
     try {
-      // Template: POST to backend register endpoint (to be implemented)
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -32,8 +31,13 @@ export default function RegisterPage() {
         setError(data.message ?? 'Registrasi gagal.');
         return;
       }
-      // on success redirect to intended page
-      router.push(redirect);
+      // on success redirect based on role
+      const userRole = data.user?.role;
+      if (userRole === 'user') {
+        router.push('/dashboard/user');
+      } else {
+        router.push(redirect);
+      }
       router.refresh();
     } catch (err) {
       setError('Tidak dapat terhubung ke server.');

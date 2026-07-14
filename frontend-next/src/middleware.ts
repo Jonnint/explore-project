@@ -44,6 +44,23 @@ export async function middleware(req: NextRequest) {
 
   // Udah login & buka halaman login — redirect ke dashboard
   if (isLoginPage && token) {
+    try {
+      const res = await fetch(`${API_URL}/api/auth/me`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json',
+        },
+      });
+      if (res.status === 200) {
+        const data = await res.json();
+        if (data.user?.role === 'user') {
+          return NextResponse.redirect(new URL('/dashboard/user', req.url));
+        }
+      }
+    } catch {
+      // ignore
+    }
     return NextResponse.redirect(new URL('/dashboard/link-clicks', req.url));
   }
 
