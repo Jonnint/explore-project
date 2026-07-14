@@ -1,9 +1,10 @@
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { getUserFromToken } from '@/lib/get-user-server';
-import Sidebar from '@/components/sidebar';
 import Navbar from '@/components/navbar';
+import UserSidebar from '@/components/user-sidebar';
 
-export default async function DashboardLayout({
+export default async function UserDashboardLayout({
     children,
 }: {
     children: React.ReactNode;
@@ -11,24 +12,21 @@ export default async function DashboardLayout({
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
 
-    let user = null;
-    if (token) {
-        user = await getUserFromToken(token);
+    if (!token) {
+        redirect('/login');
     }
 
-    // Role 'user' has its own dedicated layout at /dashboard/user/layout.tsx
-    // which already renders Navbar + UserSidebar. Rendering them here too
-    // would produce a duplicate navbar. Return bare children and let the
-    // nested layout handle the full shell.
-    if (user?.role === 'user') {
-        return <>{children}</>;
+    const user = await getUserFromToken(token);
+
+    if (!user || user.role !== 'user') {
+        redirect('/dashboard');
     }
 
     return (
         <>
             <Navbar title="Beranda" iconName="home" showUserSection={true} user={user} />
             <div className="flex flex-1 bg-[#F9FAFB] dark:bg-[#111827]">
-                <Sidebar user={user} />
+                <UserSidebar user={user} />
                 <main className="flex-1 lg:ml-56 p-6">{children}</main>
             </div>
         </>

@@ -40,13 +40,9 @@ export default function Sidebar({ user }: Props) {
 
     const menuItems = [];
 
-    if (user?.role === 'user') {
-        menuItems.push({
-            name: 'Beranda',
-            href: '/dashboard/user',
-            icon: HomeIcon,
-        });
-    } else {
+    // Role 'user' has their own dedicated layout/sidebar under /dashboard/user
+    // so we only build admin/agent menu items here.
+    if (user?.role !== 'user') {
         menuItems.push(
             {
                 name: 'Beranda',

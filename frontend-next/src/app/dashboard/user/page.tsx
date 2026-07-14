@@ -1,34 +1,37 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { cookies } from 'next/headers';
+import { getUserFromToken } from '@/lib/get-user-server';
+import type { UserDashboardData } from '@/types/user-dashboard';
+import BerandaClient from './beranda-client';
 
 export const metadata = {
-  title: 'Dashboard User',
+    title: 'Beranda — Dashboard User',
 };
 
-export default function UserDashboard() {
-  return (
-    <div className="mx-auto max-w-6xl space-y-8 px-4 pb-8 sm:px-6 lg:px-8">
-      <div>
-        <h1 className="text-2xl font-bold text-[#1a1a18] dark:text-[#F9FAFB]">Dashboard User</h1>
-        <p className="text-sm text-[#888780] dark:text-[#9CA3AF] mt-1">
-          Selamat datang di dashboard k-link Anda.
-        </p>
-      </div>
+async function fetchUserDashboard(token: string): Promise<UserDashboardData | null> {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+    try {
+        const res = await fetch(`${API_URL}/api/user/dashboard`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+            },
+            cache: 'no-store',
+        });
+        if (!res.ok) return null;
+        return res.json() as Promise<UserDashboardData>;
+    } catch {
+        return null;
+    }
+}
 
-      <Card className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-[#1a1a18] dark:text-[#F9FAFB]">
-            Selamat Datang!
-          </CardTitle>
-          <CardDescription className="text-sm text-slate-500 dark:text-[#9CA3AF]">
-            Akun Anda saat ini aktif.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            Ini adalah halaman dashboard user kosong Anda. Anda dapat mulai menggunakannya untuk fitur-fitur selanjutnya.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
+export default async function UserBerandaPage() {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth_token')?.value ?? '';
+
+    const [user, dashboardData] = await Promise.all([
+        getUserFromToken(token),
+        fetchUserDashboard(token),
+    ]);
+
+    return <BerandaClient user={user} data={dashboardData} />;
 }
