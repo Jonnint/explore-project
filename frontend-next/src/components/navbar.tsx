@@ -9,14 +9,34 @@ import {
 } from '@heroicons/react/24/outline';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
+import type { AuthUser } from '@/lib/auth';
+
 interface NavbarProps {
     title?: string;
     iconName?: 'home' | 'products' | 'analytics' | 'knowledge' | 'settings' | 'leads';
     showUserSection?: boolean;
+    user?: AuthUser | null;
 }
 
+const getInitials = (name: string) => {
+    if (!name) return 'U';
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+};
 
-export default function Navbar({ title, showUserSection = false }: NavbarProps) {
+const getCreditDisplay = (user: AuthUser | null) => {
+    if (!user) return '0';
+    if (user.role === 'superadmin' || user.role === 'admin' || user.token_limit === null) {
+        return '∞';
+    }
+    const remaining = (user.token_limit || 0) - (user.tokens_used || 0);
+    return new Intl.NumberFormat('id-ID').format(remaining);
+};
+
+export default function Navbar({ title, showUserSection = false, user = null }: NavbarProps) {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [mounted, setMounted] = useState(false);
 
@@ -100,7 +120,7 @@ export default function Navbar({ title, showUserSection = false }: NavbarProps) 
                                 </svg>
                                 <div className="flex flex-col -space-y-0.5">
                                     <span className="text-[9px] text-[#059669] dark:text-[#6EE7B7] font-medium uppercase tracking-wide">Kredit AI WABA</span>
-                                    <span className="text-[13px] text-[#047857] dark:text-[#A7F3D0] font-bold">2.847</span>
+                                    <span className="text-[13px] text-[#047857] dark:text-[#A7F3D0] font-bold">{getCreditDisplay(user)}</span>
                                 </div>
                             </div>
 
@@ -125,7 +145,9 @@ export default function Navbar({ title, showUserSection = false }: NavbarProps) 
 
                             {/* User Avatar */}
                             <Avatar className="w-8 h-8 sm:w-9 sm:h-9 bg-[#10B981] cursor-pointer hover:bg-[#059669] transition-colors">
-                                <AvatarFallback className="bg-[#10B981] text-white text-[12px] sm:text-[13px] font-semibold">SA</AvatarFallback>
+                                <AvatarFallback className="bg-[#10B981] text-white text-[12px] sm:text-[13px] font-semibold">
+                                    {user ? getInitials(user.name) : 'SA'}
+                                </AvatarFallback>
                             </Avatar>
                         </div>
                     )}

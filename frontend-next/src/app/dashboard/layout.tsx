@@ -18,7 +18,7 @@ export default async function DashboardLayout({
 
     return (
         <>
-            <Navbar title="Beranda" iconName="home" showUserSection={true} />
+            <Navbar title="Beranda" iconName="home" showUserSection={true} user={user} />
             <div className="flex flex-1 bg-[#F9FAFB] dark:bg-[#111827]">
                 <Sidebar user={user} />
                 <main className="flex-1 lg:ml-56 p-6">{children}</main>
