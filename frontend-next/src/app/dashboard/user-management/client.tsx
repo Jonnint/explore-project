@@ -21,6 +21,7 @@ const roleStyles: Record<string, string> = {
   superadmin: 'bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300',
   admin: 'bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300',
   agent: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300',
+  user: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300',
 };
 
 const getTokenUsageColor = (used: number, limit: number | null) => {
@@ -36,8 +37,17 @@ const normalizePage = (page: number) => (page > 1 ? `${page}` : undefined);
 const roleFilters = [
   { label: 'Semua Role', value: '' },
   { label: 'Superadmin', value: 'superadmin' },
+  { label: 'User', value: 'user' },
   { label: 'Admin', value: 'admin' },
   { label: 'Agent', value: 'agent' },
+];
+
+const statusFilters = [
+  { label: 'Semua Status', value: '' },
+  { label: 'Verified', value: 'verified' },
+  { label: 'Unverified', value: 'unverified' },
+  { label: 'Active', value: 'active' },
+  { label: 'Inactive', value: 'inactive' },
 ];
 
 export default function UserManagementClient({ initialData, currentUser }: Props) {
@@ -46,6 +56,7 @@ export default function UserManagementClient({ initialData, currentUser }: Props
   const searchParams = useSearchParams();
   const currentSearch = searchParams.get('search') ?? '';
   const currentRole = searchParams.get('role') ?? '';
+  const currentStatus = searchParams.get('status') ?? '';
   const currentPage = Number(searchParams.get('page') ?? initialData.pagination.current_page);
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -90,6 +101,10 @@ export default function UserManagementClient({ initialData, currentUser }: Props
     router.push(buildPath({ role: value || undefined, page: '1' }));
   };
 
+  const handleStatusChange = (value: string) => {
+    router.push(buildPath({ status: value || undefined, page: '1' }));
+  };
+
   const handlePageChange = (page: number) => {
     router.push(buildPath({ page: normalizePage(page) }));
   };
@@ -104,6 +119,36 @@ export default function UserManagementClient({ initialData, currentUser }: Props
       router.refresh();
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Terjadi kesalahan saat reset token.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleToggleVerified = async (userId: number, verify: boolean) => {
+    if (!confirm(verify ? 'Tandai user sebagai verified?' : 'Tandai user sebagai unverified?')) return;
+    setActionLoading(userId);
+    try {
+      const url = `/api/users/${userId}/${verify ? 'verify' : 'unverify'}`;
+      const res = await fetch(url, { method: 'POST' });
+      if (!res.ok) throw new Error('Gagal mengubah status verifikasi');
+      router.refresh();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Terjadi kesalahan');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleToggleActive = async (userId: number, activate: boolean) => {
+    if (!confirm(activate ? 'Aktifkan akun user ini?' : 'Non-aktifkan akun user ini?')) return;
+    setActionLoading(userId);
+    try {
+      const url = `/api/users/${userId}/${activate ? 'activate' : 'deactivate'}`;
+      const res = await fetch(url, { method: 'POST' });
+      if (!res.ok) throw new Error('Gagal mengubah status akun');
+      router.refresh();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Terjadi kesalahan');
     } finally {
       setActionLoading(null);
     }
@@ -300,6 +345,25 @@ export default function UserManagementClient({ initialData, currentUser }: Props
                 );
               })}
             </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {statusFilters.map((s) => {
+                const active = currentStatus === s.value;
+                return (
+                  <button
+                    key={s.value || 'all-status'}
+                    type="button"
+                    onClick={() => handleStatusChange(s.value)}
+                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                      active
+                        ? 'border-slate-700 bg-slate-700 text-white'
+                        : 'border-slate-200 bg-white text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </CardHeader>
 
@@ -307,11 +371,13 @@ export default function UserManagementClient({ initialData, currentUser }: Props
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-slate-200 text-slate-500 dark:border-slate-800 dark:text-slate-400">
-                <th className="text-left py-3 px-4 text-xs font-medium">Nama</th>
+                <th className="text-left py-3 px-4 text-xs font-medium">Username</th>
                 <th className="text-left py-3 px-4 text-xs font-medium">Email</th>
                 <th className="text-left py-3 px-4 text-xs font-medium">Telepon</th>
                 <th className="text-left py-3 px-4 text-xs font-medium">Role</th>
                 <th className="text-left py-3 px-4 text-xs font-medium">Token</th>
+                <th className="text-left py-3 px-4 text-xs font-medium">Verified</th>
+                <th className="text-left py-3 px-4 text-xs font-medium">Status</th>
                 {isSuperAdmin && <th className="text-left py-3 px-4 text-xs font-medium">Aksi</th>}
               </tr>
             </thead>
@@ -350,6 +416,32 @@ export default function UserManagementClient({ initialData, currentUser }: Props
                         )}
                       </div>
                     </td>
+                    <td className="py-4 px-4">
+                      {user.role === 'user' ? (
+                        user.verified ? (
+                          <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                            Verified
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full bg-rose-50 px-2 py-1 text-xs font-semibold text-rose-600 dark:bg-rose-950 dark:text-rose-400">
+                            Unverified
+                          </span>
+                        )
+                      ) : (
+                        <span className="text-sm text-slate-500 dark:text-slate-400">N/A</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-4">
+                      {user.active === false ? (
+                        <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                          Inactive
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                          Active
+                        </span>
+                      )}
+                    </td>
                     {isSuperAdmin && (
                       <td className="py-4 px-4">
                         <div className="flex flex-wrap items-center gap-2">
@@ -362,6 +454,56 @@ export default function UserManagementClient({ initialData, currentUser }: Props
                           >
                             Edit
                           </Button>
+
+                          {user.role === 'user' &&
+                            (user.verified ? (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="h-8 rounded-md border border-emerald-500 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300"
+                                onClick={() => handleToggleVerified(user.id, false)}
+                                disabled={actionLoading === user.id}
+                              >
+                                {actionLoading === user.id ? 'Memproses...' : 'Unverify'}
+                              </Button>
+                            ) : (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="h-8 rounded-md border border-emerald-500 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300"
+                                onClick={() => handleToggleVerified(user.id, true)}
+                                disabled={actionLoading === user.id}
+                              >
+                                {actionLoading === user.id ? 'Memproses...' : 'Verify'}
+                              </Button>
+                            ))}
+
+                          {user.active === false ? (
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="h-8 rounded-md"
+                              onClick={() => handleToggleActive(user.id, true)}
+                              disabled={actionLoading === user.id}
+                            >
+                              {actionLoading === user.id ? 'Memproses...' : 'Activate'}
+                            </Button>
+                          ) : (
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="h-8 rounded-md"
+                              onClick={() => handleToggleActive(user.id, false)}
+                              disabled={actionLoading === user.id}
+                            >
+                              {actionLoading === user.id ? 'Memproses...' : 'Deactivate'}
+                            </Button>
+                          )}
+
                           <Button
                             type="button"
                             variant="ghost"

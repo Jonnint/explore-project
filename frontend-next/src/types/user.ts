@@ -1,7 +1,8 @@
-export type UserRole = 'superadmin' | 'admin' | 'agent';
+export type UserRole = 'superadmin' | 'admin' | 'agent' | 'user';
 
 export interface User {
   id: number;
+  username?: string | null;
   name: string;
   email: string;
   phone: string | null;
@@ -9,6 +10,8 @@ export interface User {
   role: UserRole;
   token_limit: number | null;
   tokens_used: number;
+  verified?: boolean;
+  active?: boolean;
   created_at?: string;
   updated_at?: string;
 }

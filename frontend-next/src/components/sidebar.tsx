@@ -76,7 +76,7 @@ export default function Sidebar({ user }: Props) {
 
     if (canViewUserManagement) {
         menuItems.push({
-            name: 'Management User',
+            name: 'Management Akun',
             href: '/dashboard/user-management',
             icon: UsersIcon,
         });

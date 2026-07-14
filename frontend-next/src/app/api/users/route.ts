@@ -18,11 +18,13 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || '';
     const role = searchParams.get('role') || '';
+    const status = searchParams.get('status') || '';
     const page = searchParams.get('page') || '1';
 
     const params = new URLSearchParams();
     if (search) params.append('search', search);
     if (role) params.append('role', role);
+    if (status) params.append('status', status);
     params.append('page', page);
 
     const res = await fetch(`${API_URL}/api/users?${params.toString()}`, {

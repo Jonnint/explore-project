@@ -36,6 +36,7 @@ export default async function UserManagementPage({
   const queryParams: Record<string, string> = { page };
   if (params.search) queryParams.search = params.search;
   if (params.role) queryParams.role = params.role;
+  if (params.status) queryParams.status = params.status;
 
   const data = await apiGet<UserListResponse>('/users', queryParams);
 
