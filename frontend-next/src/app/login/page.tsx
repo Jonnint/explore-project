@@ -3,6 +3,7 @@
 import { useState, FormEvent, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Navbar from '@/components/navbar';
+import Link from 'next/link';
 
 function LoginForm() {
   const router = useRouter();
@@ -44,11 +45,11 @@ function LoginForm() {
       <h1 className="text-[28px] font-semibold text-[#1F2937] text-center mb-2">
         Selamat Datang Kembali
       </h1>
-      <p className="text-[14px] text-[#6B7280] text-center mb-8">
+          <p className="text-[14px] text-[#6B7280] text-center mb-8">
         Baru Di K-Link?{' '}
-        <span className="text-[#10B981] font-medium cursor-pointer hover:underline">
+        <Link href="/register" className="text-[#10B981] font-medium cursor-pointer hover:underline">
           Daftar
-        </span>
+        </Link>
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-5">
